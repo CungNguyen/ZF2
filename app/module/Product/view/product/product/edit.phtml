@@ -46,8 +46,10 @@ echo $this->formHidden($form->get('productid'));
 </div>
 <div class="form-group">
     <?php
-    if(null!= $form->get('img')) {
+    if(null!= $form->get('img')->getValue()) {
         echo '<img src="\assets\\'. $form->get('img')->getValue() .'" alt="" /><br/>';
+    } else {
+        echo '<p>Please choose the photo for product.</p>';
     }
     echo $this->formRow($form->get('img')->setAttribute('class', 'form-control'));
     ?>

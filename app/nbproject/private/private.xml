@@ -6,9 +6,10 @@
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/view/product/product/delete.phtml</file>
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/src/Product/Model/ProductTable.php</file>
             <file>file:/E:/Projects/PHP/estorevn/app/public/index.php</file>
+            <file>file:/E:/Projects/PHP/estorevn/app/vendor/zendframework/zendframework/library/Zend/Form/Form.php</file>
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/view/product/product/add.phtml</file>
-            <file>file:/E:/Projects/PHP/estorevn/app/module/Product/src/Product/Controller/ProductController.php</file>
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/src/Product/Model/Product.php</file>
+            <file>file:/E:/Projects/PHP/estorevn/app/module/Product/src/Product/Controller/ProductController.php</file>
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/src/Product/Form/ProductForm.php</file>
             <file>file:/E:/Projects/PHP/estorevn/app/module/Product/view/product/product/edit.phtml</file>
         </group>

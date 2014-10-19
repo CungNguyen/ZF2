@@ -163,4 +163,8 @@ class Product {
         return $this->inputFilter;
     }
 
+    public function setImg($img) {
+        $this->img = $img;
+    }
+
 }

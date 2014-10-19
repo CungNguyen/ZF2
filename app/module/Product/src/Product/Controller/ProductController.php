@@ -17,6 +17,7 @@ use Product\Form\ProductForm;
 class ProductController extends AbstractActionController {
 
     protected $productTable;
+    protected $categoryTable;
 
     public function indexAction() {
         return new ViewModel(array(
@@ -27,20 +28,15 @@ class ProductController extends AbstractActionController {
     public function addAction() {
         $form = new ProductForm();
         $form->get('submit')->setValue('Add');
-
+        $categoryList = $this->getCategoryList();
+        $form->get('categoryid')->setValueOptions($categoryList);
         $request = $this->getRequest();
         if ($request->isPost()) {
             $product = new Product();
             $form->setInputFilter($product->getInputFilter());
 
             $postArr = $request->getPost()->toArray();
-            $fileArr = $this->params()->fromFiles('img');
-            $data = array_merge(
-                    $postArr, array('file' => $fileArr['name'])
-            );
-
             $form->setData($postArr);
-
             $file = $this->params()->fromFiles('img');
 
             if ($form->isValid()) {
@@ -69,19 +65,33 @@ class ProductController extends AbstractActionController {
             ));
         }
         $product = $this->getProductTable()->getProduct($id);
+        $img = $product->img;
 
         $form = new ProductForm();
-        $form->bind($product);
+        $form->bind($product); // bind form to object, getData will return this object
         $form->get('submit')->setAttribute('value', 'Edit');
-
+        $categoryList = $this->getCategoryList();
+        $form->get('categoryid')->setValueOptions($categoryList)->setValue($product->categoryid);
         $request = $this->getRequest();
         if ($request->isPost()) {
             $form->setInputFilter($product->getInputFilter());
-            $form->setData($request->getPost());
+
+            $postArr = $request->getPost()->toArray();
+            $form->setData($postArr);
+            $file = $this->params()->fromFiles('img');
+
 
             if ($form->isValid()) {
-                $this->getProductTable()->saveProduct($form->getData());
+                $adapter = new \Zend\File\Transfer\Adapter\Http();
+                $adapter->setDestination(getcwd() . '\public\assets');
+                $formData = $form->getData();
 
+                if ($adapter->receive($file['name'])) {
+                    $formData->setImg($adapter->getFileName(null, false));
+                } else {
+                    $formData->setImg($img);
+                }
+                $this->getProductTable()->saveProduct($formData);
                 return $this->redirect()->toRoute('product');
             } else {
                 var_dump($form->getMessages());
@@ -126,4 +136,20 @@ class ProductController extends AbstractActionController {
         return $this->productTable;
     }
 
+    public function getCategoryTable() {
+        if (!$this->categoryTable) {
+            $sm = $this->getServiceLocator();
+            $this->categoryTable = $sm->get('Product\Model\CategoryTable');
+        }
+        return $this->categoryTable;
+    }
+    
+    public function getCategoryList() {
+        $categoryTable = $this->getCategoryTable()->fetchAll();
+        $categoryList = array();
+        foreach($categoryTable as $category) {
+            $categoryList[$category->categoryid] = $category->title;
+        }
+        return $categoryList;
+    }
 }

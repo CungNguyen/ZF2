@@ -3,6 +3,7 @@
 namespace Product\Form;
 
 use Zend\Form\Form;
+use Zend\Form\Element;
 
 class ProductForm extends Form
 {
@@ -83,11 +84,9 @@ class ProductForm extends Form
         ));
         $this->add(array(
             'name' => 'categoryid',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
+            'type'  => 'select',
             'options' => array(
-                'label' => 'Category',
+                'label' => 'Category'
             ),
         ));
         $this->add(array(
