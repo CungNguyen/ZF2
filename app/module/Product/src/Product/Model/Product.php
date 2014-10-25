@@ -124,9 +124,9 @@ class Product {
                         'required' => false,
                         'validators' => array(
                             array(
-                                'name' => 'Alnum',
+                                'name' => 'StringLength',
                                 'options' => array(
-                                    'allowWhiteSpace' => true
+                                    'max' => 1000
                                 )
                             )
                         ),

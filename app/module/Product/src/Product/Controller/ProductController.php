@@ -13,15 +13,19 @@ use Zend\View\Model\ViewModel;
 use Zend\Validator\File\Size;
 use Product\Model\Product;
 use Product\Form\ProductForm;
+use Product\Model\ProductModel;
+use Product\InputFilter\ProductFilter;
+use Product\Entity\ProductEntity;
 
 class ProductController extends AbstractActionController {
 
     protected $productTable;
     protected $categoryTable;
+    protected $productModel;
 
     public function indexAction() {
         return new ViewModel(array(
-            'products' => $this->getProductTable()->fetchAll(),
+            'products' => $this->getProductModel()->getListProduct(),
         ));
     }
 
@@ -32,8 +36,8 @@ class ProductController extends AbstractActionController {
         $form->get('categoryid')->setValueOptions($categoryList);
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $product = new Product();
-            $form->setInputFilter($product->getInputFilter());
+            $product = new ProductEntity();
+            $form->setInputFilter(new ProductFilter());
 
             $postArr = $request->getPost()->toArray();
             $form->setData($postArr);
@@ -42,14 +46,14 @@ class ProductController extends AbstractActionController {
             if ($form->isValid()) {
                 $adapter = new \Zend\File\Transfer\Adapter\Http();
                 $adapter->setDestination(getcwd() . '\public\assets');
+                $formData = $form->getData();
                 if ($adapter->receive($file['name'])) {
-                    $formData = $form->getData();
                     $formData['img'] = $adapter->getFileName(null, false);
-                    $product->exchangeArray($formData);
-                    $this->getProductTable()->saveProduct($product);
-                    // Redirect to list of albums
-                    return $this->redirect()->toRoute('product');
                 }
+                $product->exchangeArray($formData);
+                $this->getProductModel()->saveProduct($product);
+                // Redirect to list of albums
+                return $this->redirect()->toRoute('product');
             } else {
                 var_dump($form->getMessages());
             }
@@ -64,17 +68,17 @@ class ProductController extends AbstractActionController {
                         'action' => 'add'
             ));
         }
-        $product = $this->getProductTable()->getProduct($id);
-        $img = $product->img;
+        $product = $this->getProductModel()->getProduct($id);
+        $img = $product->getImg();
 
         $form = new ProductForm();
         $form->bind($product); // bind form to object, getData will return this object
         $form->get('submit')->setAttribute('value', 'Edit');
         $categoryList = $this->getCategoryList();
-        $form->get('categoryid')->setValueOptions($categoryList)->setValue($product->categoryid);
+        $form->get('categoryid')->setValueOptions($categoryList)->setValue($product->getCategoryId());
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $form->setInputFilter($product->getInputFilter());
+            $form->setInputFilter(new ProductFilter());
 
             $postArr = $request->getPost()->toArray();
             $form->setData($postArr);
@@ -91,7 +95,7 @@ class ProductController extends AbstractActionController {
                 } else {
                     $formData->setImg($img);
                 }
-                $this->getProductTable()->saveProduct($formData);
+                $this->getProductModel()->saveProduct($formData);
                 return $this->redirect()->toRoute('product');
             } else {
                 var_dump($form->getMessages());
@@ -115,7 +119,7 @@ class ProductController extends AbstractActionController {
             $del = $request->getPost('del', 'No');
             if ($del == 'Yes') {
                 $id = (int) $request->getPost('id');
-                $this->getProductTable()->deleteProduct($id);
+                $this->getProductModel()->delete($id);
             }
 
             // Redirect to list of albums
@@ -143,13 +147,22 @@ class ProductController extends AbstractActionController {
         }
         return $this->categoryTable;
     }
-    
+
     public function getCategoryList() {
         $categoryTable = $this->getCategoryTable()->fetchAll();
         $categoryList = array();
-        foreach($categoryTable as $category) {
+        foreach ($categoryTable as $category) {
             $categoryList[$category->categoryid] = $category->title;
         }
         return $categoryList;
     }
+
+    public function getProductModel() {
+        if (!$this->productModel) {
+            $serviceManager = $this->getServiceLocator();
+            $this->productModel = new ProductModel($serviceManager);
+        }
+        return $this->productModel;
+    }
+
 }

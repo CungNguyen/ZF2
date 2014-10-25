@@ -38,16 +38,16 @@ class Module {
                     $resultSetPrototype->setArrayObjectPrototype(new Product());
                     return new TableGateway('product', $dbAdapter, null, $resultSetPrototype);
                 },
-                'Product\Model\CategoryTable' => function($sm) {
-                    $tableGateway = $sm->get('CategoryTableGateway');
-                    $table = new CategoryTable($tableGateway);
-                    return $table;
-                },
-                'CategoryTableGateway' => function ($sm) {
+                'CategoryTableGateway' => function ($sm) { 
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new Category());
                     return new TableGateway('category', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Product\Model\CategoryTable' => function($sm) {
+                    $tableGateway = $sm->get('CategoryTableGateway');
+                    $table = new CategoryTable($tableGateway);
+                    return $table;
                 },
             ),
         );

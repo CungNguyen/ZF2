@@ -14,10 +14,25 @@
 return array(
     'db' => array(
         'driver'         => 'Pdo',
-        'dsn'            => 'mysql:dbname=estorevn;host=localhost;port=3306',
+        'dsn'            => 'mysql:dbname=estore;host=localhost;port=3306',
         'driver_options' => array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
+    ),
+    'doctrine' => array(
+        'connection' => array(
+            // default connection name
+            'orm_default' => array(
+                'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+                'params' => array(
+                    'host'     => 'localhost',
+                    'port'     => '3306',
+                    'user'     => 'root',
+                    'password' => '123456',
+                    'dbname'   => 'estore',
+                )
+            )
+        )
     ),
     'service_manager' => array(
         'factories' => array(
